@@ -1,5 +1,7 @@
 # Social Media App
 
+#### mongoDB: mongodb+srv://perfcreg:sevtech007$$@cluster0-63opm.mongodb.net/test?retryWrites=true&w=majority
+
 A moderator app that grabs post from instagram for people.
 
 # Todo
