@@ -1,0 +1,19 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "description": "A simple social app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phemieny7/social-app.git"
+  },
+  "author": "Perfcreg Solution",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phemieny7/social-app/issues"
+  },
+  "homepage": "https://github.com/phemieny7/social-app#readme"
+}
