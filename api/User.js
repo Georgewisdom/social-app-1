@@ -57,7 +57,7 @@ router.post("/register", async (req, res) => {
       from: `application@socialapp.com`, // sender address
       to: `${newUser.email}`, // list of receivers
       subject: 'Kindly Confirm Email', // Subject line
-      html: `<p>Kindly Confirm your email to complete your registration process<br>
+      html: `<p>Kindly Confirm your email to complet your registration process<br>
               kindly click the link below to confirm your email <br>
               https://${req.headers.host}/api/users/verify/${newUser.secretToken}
       </p>`// plain text body
