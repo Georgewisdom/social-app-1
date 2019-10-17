@@ -26,4 +26,4 @@ server.use(express.urlencoded({ extended: false }));
 server.use("/api/user", require("./api/User"));
 
 // Config
-server.listen(config.get("port"), () => console.log(`server process runing on ${(config.get("port"))}` ));
+server.listen(config.get("port"), () => console.log("server process runing"));

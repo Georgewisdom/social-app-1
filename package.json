@@ -17,15 +17,17 @@
   },
   "homepage": "https://github.com/phemieny7/social-app#readme",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "config": "^3.2.3",
     "express": "^4.17.1",
     "express-validator": "^6.2.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.5",
     "mongoose-timestamp": "^0.6.0",
     "morgan": "^1.9.1",
-    "validator": "^11.1.0"
+    "nodemailer": "^6.3.1",
+    "validator": "^11.1.0",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"
