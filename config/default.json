@@ -1,0 +1,4 @@
+{
+  "port": 5000,
+  "mongoURI": "mongodb+srv://perfcreg:sevtech007$$@cluster0-gizre.mongodb.net/test?retryWrites=true&w=majority"
+}

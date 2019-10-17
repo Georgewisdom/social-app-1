@@ -4,7 +4,7 @@
   "description": "A simple social app",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,18 @@
   "bugs": {
     "url": "https://github.com/phemieny7/social-app/issues"
   },
-  "homepage": "https://github.com/phemieny7/social-app#readme"
+  "homepage": "https://github.com/phemieny7/social-app#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "config": "^3.2.3",
+    "express": "^4.17.1",
+    "express-validator": "^6.2.0",
+    "mongoose": "^5.7.5",
+    "mongoose-timestamp": "^0.6.0",
+    "morgan": "^1.9.1",
+    "validator": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  }
 }
