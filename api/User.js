@@ -1,22 +1,36 @@
 const router = require("express").Router();
 const User = require("../model/User");
 const bcrypt = require("bcryptjs");
+
 const { check, validationResult } = require("express-validator");
+
+// @route   GET api/user/register
+// @desc    Tests users route
+// @access  Public
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password,  } = req.body;
     const user = await User.findOne({ email: email });
-
+     
     if (user) {
       res.status(400).json({
         errors: [{ msg: "User Already Exist" }]
       });
     }
+    function generateRandomString(length) {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      for ( i = 0; i < length; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      return text;
+    }
+    const secretToken =  generateRandomString(30);
 
     const newUser = new User({
       name,
       email,
-      password
+      password,
+      secretToken
     });
 
     bcrypt.genSalt(10, (err, salt) => {
@@ -34,6 +48,10 @@ router.post("/register", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+// @route   GET api/user/r
+// @desc    Tests users route
+// @access  Public
 
 module.exports = router;
 

@@ -6,18 +6,34 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  
   email: {
     type: String,
     required: true,
     unique: true
   },
+
   password: {
     type: String,
     required: true,
     min: 4,
     max: 255,
     unique: true
-  }
+  },
+
+  secretToken:{
+    type: String,
+  },
+
+  isVerified: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  passwordResetToken: {
+  	type: String,
+  },
+
 });
 UserSchema.plugin(timestamps);
 module.exports = User = mongoose.model("User", UserSchema);
