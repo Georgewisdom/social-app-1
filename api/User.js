@@ -2,7 +2,7 @@ const router = require("express").Router();
 const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const mailgun = require("mailgun-js");
 const config = require("config");
 const authenticate = require("../middleware/authenticate");
 const validateRegisterInput = require("../validation/register");
@@ -23,14 +23,6 @@ router.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
     const user = await User.findOne({ email: email });
 
-    let transporter = await nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-             user: 'perfcreg@gmail.com',
-             pass: 'perfcreg007'
-         }
-     });
-
     if (user) {
       res.status(400).json({
         errors: [{ msg: "User Already Exist" }]
@@ -40,11 +32,11 @@ router.post("/register", async (req, res) => {
     function generateRandomString(length) {
       var text = "";
       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      for ( i = 0; i < length; i++)
+      for (i = 0; i < length; i++)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
       return text;
     }
-    const secretToken =  generateRandomString(30);
+    const secretToken = generateRandomString(30);
 
     const newUser = new User({
       name,
@@ -53,16 +45,18 @@ router.post("/register", async (req, res) => {
       secretToken
     });
 
-    const mailOptions = {
-      from: `application@socialapp.com`, // sender address
-      to: `${newUser.email}`, // list of receivers
-      subject: 'Kindly Confirm Email', // Subject line
-      html: `<p>Kindly Confirm your email to complete your registration process<br>
-              kindly click the link below to confirm your email <br>
-              https://${req.headers.host}/api/users/verify/${newUser.secretToken}
-      </p>`// plain text body
-    };
 
+    const mg = mailgun({ apiKey: config.get("mailgun-key"), domain: config.get("mailgun") });
+    const data = {
+      from: 'no-reply@yourwebapplication.com',
+      to: newUser.email,
+      subject: 'Account Verification Token',
+      html: `
+                            <h3> Hello  <i>${name}</i></h3>
+                            <p> Please verify your account by clicking the button Below</p><br>
+                            <a href = "https://${req.headers.host}/api/users/verify/${newUser.secretToken}"><button>confirm your account</button></a>
+                            `
+    };
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(newUser.password, salt, (err, hash) => {
         if (err) throw err;
@@ -70,43 +64,53 @@ router.post("/register", async (req, res) => {
         newUser
           .save()
           .then(user => {
-            jwt.sign(
-              { id: user.id },
-              config.get("tokenSecret"),
-              { expiresIn: 3600 },
-              (error, token) => {
-                if (error) throw error;
-                res.json({
-                  token: token,
-                  message: "Acount Created",
-                  user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
-                  }
-                });
-              }
+            res.json({
+              message: "Please verify your email"
+            }
             );
           })
-
           .catch(err => console.log(err));
       });
     });
 
-  await transporter.sendMail(mailOptions, function (err, info) {
-      if(err)
-        console.log(err)
-      else
-        console.log(info);
-   });
-  
+    mg.messages().send(data, function (error, body) {
+      console.log(body);
+    });
+
   } catch (error) {
     console.error(error);
     res.status(500).send("Server error");
   }
 });
 
-// @route   GET api/user/register
+//@route Post api/user/verify
+//@desc  verify email
+//access  Private
+
+router.post('/verify/:secretToken', async (req, res) => {
+  const secretToken = req.params.secretToken;
+
+  try {
+    const user = await User.findOne({ 'secretToken': secretToken });
+    if (!user) {
+      const secretToken = 'This is not our secret Token or it has expires';
+      return res.status(404).json(secretToken);
+    }
+
+    if (user) {
+      user.isVerified = true;
+      user.secretToken = '';
+      const saved = await user.save()
+      res.json(saved)
+    }
+  }
+  catch (err) {
+    console.log(err)
+  }
+});
+
+
+// @route   GET api/user/login
 // @desc    Register New User
 // @access  Public
 router.post("/login", async (req, res) => {
