@@ -44,7 +44,7 @@ const ProfileSchema = new mongoose.Schema({
     }
   },
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Users"
   }
 });
