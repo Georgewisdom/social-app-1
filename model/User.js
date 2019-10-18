@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  
+
   email: {
     type: String,
     required: true,
@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({
     unique: true
   },
 
-  secretToken:{
+  secretToken: {
     type: String,
   },
 
@@ -31,7 +31,10 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   passwordResetToken: {
-  	type: String,
+    type: String,
+  },
+  passwordResetExpires: {
+    type: Date,
   },
 
 });
