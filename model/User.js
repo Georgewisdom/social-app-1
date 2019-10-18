@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   },
 
   secretToken: {
-    type: String,
+    type: String
   },
 
   isVerified: {
@@ -31,12 +31,11 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   passwordResetToken: {
-    type: String,
+    type: String
   },
   passwordResetExpires: {
-    type: Date,
-  },
-
+    type: Date
+  }
 });
 UserSchema.plugin(timestamps);
 module.exports = User = mongoose.model("User", UserSchema);
