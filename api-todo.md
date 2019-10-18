@@ -8,7 +8,7 @@ A moderator app that grabs post from instagram for people
 
    ## APi
 
-~~### USER~~
+### USER
 	~~1. user login~~
 	~~2. user registration~~
 	~~3. user verification~~
