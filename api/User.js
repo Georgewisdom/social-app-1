@@ -8,7 +8,8 @@ const config = require("config");
 const authenticate = require("../middleware/authenticate");
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
-const validateResetInput = require("../validation/forgetPassword");
+const validateForgetInput = require("../validation/forgetPassword");
+const validateResetInput = require("../validation/resetPassword");
 
 // @route   GET api/user/register
 // @desc    Register New User
@@ -108,7 +109,7 @@ router.post('/verify/:secretToken', async (req, res) => {
 // @desc    reset password User
 // @access  Public
 router.post('/forgetpassword', async (req, res) => {
-  const { errors, isValid } = validateResetInput(req.body);
+  const { errors, isValid } = validateForgetInput(req.body);
 
   // Check Validation
   if (!isValid) {
@@ -163,6 +164,43 @@ router.post('/forgetpassword', async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+// @route   POST api/user/resetpassword
+// @desc    Reset password
+// @access  Private
+router.post('/resetpassword/:passwordResetToken', async (req, res) => {
+  const { errors, isValid } = validateResetInput(req.body);
+  //const passwordResetToken = req.params.passwordResetToken;
+  const { password, password2 } = req.body;
+  // Check Validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  try {
+    const user = await User.findOne({ passwordResetToken: req.params.passwordResetToken, passwordResetExpires: { $gt: Date.now() } });
+    if (!user) {
+      const passwordResetToken = 'This is not our password reset token';
+      return res.status(400).json(passwordResetToken);
+    }
+
+    if (user.passwordResetToken < Date.now()) {
+      return res.status(400).json("This password reset token has expire, request a new one")
+    }
+
+    if (user) {
+      user.password = bcrypt.hashSync(password, 10);
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      const save = user.save()
+      return res.status(200).json("Password reset successfull");
+    }
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
+});
+
 
 
 // @route   GET api/user/login
