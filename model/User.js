@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  
+
   email: {
     type: String,
     required: true,
@@ -21,8 +21,8 @@ const UserSchema = new mongoose.Schema({
     unique: true
   },
 
-  secretToken:{
-    type: String,
+  secretToken: {
+    type: String
   },
 
   isVerified: {
@@ -31,9 +31,11 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   passwordResetToken: {
-  	type: String,
+    type: String
   },
-
+  passwordResetExpires: {
+    type: Date
+  }
 });
 UserSchema.plugin(timestamps);
 module.exports = User = mongoose.model("User", UserSchema);
