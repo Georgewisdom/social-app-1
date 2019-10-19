@@ -54,6 +54,7 @@ router.post(
       email,
       bio,
       gender,
+      isComplete,
       dateOfBirth,
       facebook,
       instagram,
@@ -72,6 +73,7 @@ router.post(
     if (email) profileBuild.email = email;
     if (bio) profileBuild.bio = bio;
     if (gender) profileBuild.gender = gender;
+    if (isComplete) profileBuild.isComplete = isComplete;
     if (dateOfBirth) profileBuild.dateOfBirth = dateOfBirth;
     if (twitter) profileBuild.social.twitter = twitter;
     if (facebook) profileBuild.social.facebook = facebook;
