@@ -40,11 +40,11 @@ const ProfileSchema = new mongoose.Schema({
       type: String
     },
     twitter: {
-      type: String
+      type: String,
     }
   },
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Users"
   }
 });
