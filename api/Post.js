@@ -53,7 +53,7 @@ router.post(
 // @access   Private
 router.get("/", authenticate, async (req, res) => {
   // Get User from db
-  const posts = await Post.find().sort({ date: -1 });
+  const posts = await Post.find().sort({ date: 1 });
 
   res.status(200).json(posts);
 });
