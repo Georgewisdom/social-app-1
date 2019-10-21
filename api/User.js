@@ -191,21 +191,19 @@ router.post("/login", async (req, res) => {
   if (pasMatch) {
     // Generate Token
     jwt.sign(
-      { id: user.id, name: user.name },
+      { id: user.id },
       config.get("tokenSecret"),
       { expiresIn: 3600 },
       (error, token) => {
         if (error) throw error;
         res.json({
-          token: token,
           message: "You are Logged In",
           user: {
             id: user.id,
             name: user.name,
             email: user.email,
             token: token
-          },
-          profile
+          }
         });
       }
     );
@@ -249,7 +247,7 @@ router.get("/:id", async (req, res) => {
         user,
         request: {
           type: "get",
-          url: "http://localhost:5000/api/acount/" + profile.id
+          url: "http://localhost:5000/api/account/" + profile.id
         },
         profile
       });
