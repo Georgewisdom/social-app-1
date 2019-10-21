@@ -38,7 +38,7 @@ router.post(
         category: req.body.category
       });
       const createdPost = await newPost.save();
-      user.posts = createdPost;
+
       res.status(200).json({
         createdPost
       });
