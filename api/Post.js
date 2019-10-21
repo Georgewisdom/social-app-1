@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Post = require("../model/Posts");
+const User = require("../model/User");
 const authenticate = require("../middleware/authenticate");
 const { check, validationResult } = require("express-validator");
 
@@ -33,16 +34,27 @@ router.post(
       const newPost = new Post({
         title: req.body.tile,
         body: req.body.body,
-        name: user,
+        user: user,
         category: req.body.category
       });
       const createdPost = await newPost.save();
 
       res.status(200).json({
-        createdPost,
-        name: user.name
+        createdPost
       });
-    } catch (error) {}
+    } catch (error) {
+      res.status(500).json({ msg: "server error" });
+    }
   }
 );
+
+// @route    POST api/post
+// @desc     create a new post
+// @access   Private
+router.get("/", authenticate, async (req, res) => {
+  // Get User from db
+  const posts = await Post.find().sort({ date: 1 });
+
+  res.status(200).json(posts);
+});
 module.exports = router;
