@@ -169,7 +169,7 @@ router.post("/forgetpassword", async (req, res) => {
 // @route   POST api/user/resetpassword
 // @desc    Reset password
 // @access  Private
-router.post('/resetpassword/:passwordResetToken', async (req, res) => {
+router.post("/resetpassword/:passwordResetToken", async (req, res) => {
   const { errors, isValid } = validateResetInput(req.body);
   //const passwordResetToken = req.params.passwordResetToken;
   const { password, password2 } = req.body;
@@ -178,32 +178,33 @@ router.post('/resetpassword/:passwordResetToken', async (req, res) => {
     return res.status(400).json(errors);
   }
   try {
-    const user = await User.findOne({ passwordResetToken: req.params.passwordResetToken, passwordResetExpires: { $gt: Date.now() } });
+    const user = await User.findOne({
+      passwordResetToken: req.params.passwordResetToken,
+      passwordResetExpires: { $gt: Date.now() }
+    });
     if (!user) {
-      const passwordResetToken = 'This is not our password reset token';
+      const passwordResetToken = "This is not our password reset token";
       return res.status(400).json(passwordResetToken);
     }
 
     if (user.passwordResetToken < Date.now()) {
-      return res.status(400).json("This password reset token has expire, request a new one")
+      return res
+        .status(400)
+        .json("This password reset token has expire, request a new one");
     }
 
     if (user) {
       user.password = bcrypt.hashSync(password, 10);
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
-      const save = user.save()
+      const save = user.save();
       return res.status(200).json("Password reset successfull");
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).send("Server error");
   }
 });
-
-
-
 
 // @route   GET api/user/login
 // @desc    Register New User
