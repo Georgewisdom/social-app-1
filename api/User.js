@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const User = require("../model/User");
+const Profile = require("../model/Profile");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const generateRandomString = require("../middleware/randomString");
@@ -177,6 +178,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   // Check For User Existence
   const user = await User.findOne({ email });
+  const profile = await Profile.findOne({ user: user.id }).populate("User");
 
   if (!user) {
     errors.email = "Not Found";
@@ -202,7 +204,8 @@ router.post("/login", async (req, res) => {
             name: user.name,
             email: user.email,
             token: token
-          }
+          },
+          profile
         });
       }
     );
@@ -212,6 +215,9 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// @route   GET api/user
+// @desc    Check Auth User
+// @access  Private
 router.get("/", authenticate, async (req, res) => {
   User.findById(req.user.id)
     .select("-password")
@@ -225,6 +231,31 @@ router.get("/", authenticate, async (req, res) => {
         }
       })
     );
+});
+
+// @route   GET api/user/:id
+// @desc    GET User by ID
+// @access  Public
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+
+    const profile = await Profile.findOne({ user: user.id }).populate("User");
+
+    if (!user) {
+      res.status(400).json({ msg: "User not found" });
+    } else {
+      res.status(200).json({
+        user,
+        request: {
+          type: "get",
+          url: "http://localhost:5000/api/acount/" + profile.id
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 module.exports = router;

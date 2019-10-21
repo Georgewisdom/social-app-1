@@ -10,14 +10,43 @@ const { check, validationResult } = require("express-validator");
 router.get("/", authenticate, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id }).populate(
-      "User"
+      "User",
+      ["name"]
     );
 
     if (!profile) {
-      return res.status(400).json({ msg: "There is no profile for this user" });
+      return res.status(400).json({ msg: "Please complete your profile" });
     }
 
-    res.json({});
+    const user = await User.findOne({ _id: req.user.id });
+
+    res.json({
+      profile,
+      user: {
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route    GET api/account/:id
+// @desc     Get current users profile by ID
+// @access   Private
+router.get("/:id", authenticate, async (req, res) => {
+  try {
+    const profile = await Profile.findOne(req.params.id);
+
+    if (!profile) {
+      return res.status(400).json({ msg: "Please complete your profile" });
+    }
+
+    res.json({
+      profile
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -66,7 +95,7 @@ router.post(
     profileBuild.social = {};
     //   Set Profile Build
     profileBuild.user = req.user.id;
-    //   Value Bui;ds
+    //   Value Builds
     if (business_name) profileBuild.business_name = business_name;
     if (handler) profileBuild.handler = handler;
     if (website) profileBuild.website = website;
@@ -84,18 +113,20 @@ router.post(
       { user: req.user.id },
       { $set: profileBuild },
       { new: true, upsert: true }
-    ).then(profile => {
-      res
-        .json({
+    )
+      .then(profile => {
+        res.json({
           profile: profile,
-          message: "Profile Created",
+          message: profile.isComplete
+            ? "profile created"
+            : "please endeavour to complete profile",
           request: {
             type: "get",
             url: "http://localhost:5000/api/user/" + profile.user
           }
-        })
-        .catch(error => console.log(error));
-    });
+        });
+      })
+      .catch(error => console.log(error));
   }
 );
 
