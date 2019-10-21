@@ -41,7 +41,7 @@ router.get("/:id", authenticate, async (req, res) => {
     const profile = await Profile.findOne(req.params.id);
 
     if (!profile) {
-      return res.status(400).json({ msg: "Please complete your profile" });
+      return res.status(400).json({ msg: "Please complete your profil" });
     }
 
     res.json({
