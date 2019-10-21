@@ -38,10 +38,10 @@ router.get("/", authenticate, async (req, res) => {
 // @access   Private
 router.get("/:id", authenticate, async (req, res) => {
   try {
-    const profile = await Profile.findOne(req.params.id);
+    const profile = await Profile.findOne({ _id: req.params.id });
 
     if (!profile) {
-      return res.status(400).json({ msg: "Please complete your profil" });
+      return res.status(400).json({ msg: "Please complete your profile" });
     }
 
     res.json({

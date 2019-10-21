@@ -26,6 +26,7 @@ server.use(express.urlencoded({ extended: false }));
 // Routes
 server.use("/api/user", require("./api/User"));
 server.use("/api/account", require("./api/Profile"));
+server.use("/api/posts", require("./api/Post"));
 
 // Config
 server.listen(config.get("port"), () => console.log("server process runing"));

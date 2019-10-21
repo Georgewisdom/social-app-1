@@ -1,3 +1,5 @@
+import { Mongoose } from "mongoose";
+
 // Reading a feed - API Response
 [
   {
@@ -42,5 +44,43 @@
     next:
       "/api/v1.0/feed/timeline/jessica/?api_key=jvf5pettrzsj&id_lt=9228b3d8-f254-11e9-8d62-0a0d7a10423a&limit=3",
     duration: "9.20ms"
+  }
+];
+
+// post api structure
+[
+  {
+    kind: "post",
+    likeCount: integer,
+    moderationStatus: string,
+    user: {
+      ref: "User",
+      type: Mongoose.objectID
+    },
+    text: string,
+    isBlock: Boolean,
+    likes: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "User"
+        }
+      }
+    ],
+    comments: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "Users"
+        },
+        title: {
+          type: String,
+          required: true
+        },
+        name: {
+          type: String
+        }
+      }
+    ]
   }
 ];

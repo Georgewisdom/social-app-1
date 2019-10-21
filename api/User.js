@@ -178,7 +178,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   // Check For User Existence
   const user = await User.findOne({ email });
-  const profile = await Profile.findOne({ user: user.id }).populate("User");
+  // const profile = await Profile.findOne({ user: user.id }).populate("User");
 
   if (!user) {
     errors.email = "Not Found";
@@ -250,7 +250,8 @@ router.get("/:id", async (req, res) => {
         request: {
           type: "get",
           url: "http://localhost:5000/api/acount/" + profile.id
-        }
+        },
+        profile
       });
     }
   } catch (error) {
