@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Post = require("../model/Posts");
+const User = require("../model/User");
 const authenticate = require("../middleware/authenticate");
 const { check, validationResult } = require("express-validator");
 
@@ -37,7 +38,7 @@ router.post(
         category: req.body.category
       });
       const createdPost = await newPost.save();
-
+      user.posts = createdPost;
       res.status(200).json({
         createdPost
       });
@@ -46,4 +47,14 @@ router.post(
     }
   }
 );
+
+// @route    POST api/post
+// @desc     create a new post
+// @access   Private
+router.get("/", authenticate, async (req, res) => {
+  // Get User from db
+  const posts = await Post.find().sort({ date: -1 });
+
+  res.status(200).json(posts);
+});
 module.exports = router;
