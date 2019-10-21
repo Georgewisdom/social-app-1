@@ -70,7 +70,7 @@ router.post("/register", async (req, res) => {
       });
     });
 
-    mg.messages().send(data, function(error, body) {
+    mg.messages().send(data, function (error, body) {
       console.log(body);
     });
   } catch (error) {
@@ -153,7 +153,7 @@ router.post("/forgetpassword", async (req, res) => {
                       <a href = "http://${req.headers.host}/api/user/resetpassword/${user.passwordResetToken}"><button>Reset your Account Password</button></a>
                     `
       };
-      mg.messages().send(data, function(error, body) {
+      mg.messages().send(data, function (error, body) {
         console.log(body);
       });
       //send email ends here
@@ -293,7 +293,8 @@ router.get("/:id", async (req, res) => {
         profile
       });
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error);
   }
 });
