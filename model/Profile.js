@@ -45,7 +45,7 @@ const ProfileSchema = new mongoose.Schema({
       type: String
     },
     twitter: {
-      type: String
+      type: String,
     }
   },
   user: {

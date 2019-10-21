@@ -1,7 +1,0 @@
-{
-  "port": 5000,
-  "tokenSecret": "dontTellAnybody",
-  "mongoURI": "mongodb+srv://perfcreg:sevtech007$$@cluster0-gizre.mongodb.net/test?retryWrites=true&w=majority",
-  "mailgun": "sandboxf474f0e951d240e2916b6d51bcfd5bd2.mailgun.org",
-  "mailgun-key": "ed67a95cd9b9a602169c9a623655efa5-73ae490d-26dab3ff"
-}
