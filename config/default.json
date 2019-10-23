@@ -1,0 +1,5 @@
+{
+  "mongoURI": "mongodb+srv://perfcreg:sevtech007$$@cluster0-gizre.mongodb.net/test?retryWrites=true&w=majority",
+  "tokenSecret": "jwtSecret",
+  "port": 5000
+}
