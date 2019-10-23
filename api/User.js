@@ -70,9 +70,19 @@ router.post("/register", async (req, res) => {
       });
     });
 
-    mg.messages().send(data, function (error, body) {
+    mg.messages().send(data, function(error, body) {
       console.log(body);
     });
+    // get date
+    let today = new Date().toLocaleDateString();
+    // add activity
+    const activity = {
+      msg: "your account was created on " + today
+    };
+    // add additivity to user records
+    user.activities.unshift(activity);
+    // save the user
+    await user.save();
   } catch (error) {
     console.error(error);
     res.status(500).send("Server error");
@@ -153,7 +163,7 @@ router.post("/forgetpassword", async (req, res) => {
                       <a href = "http://${req.headers.host}/api/user/resetpassword/${user.passwordResetToken}"><button>Reset your Account Password</button></a>
                     `
       };
-      mg.messages().send(data, function (error, body) {
+      mg.messages().send(data, function(error, body) {
         console.log(body);
       });
       //send email ends here
@@ -200,6 +210,16 @@ router.post("/resetpassword/:passwordResetToken", async (req, res) => {
       const save = user.save();
       return res.status(200).json("Password reset successfull");
     }
+    // get date
+    let today = new Date().toLocaleDateString();
+    // add activity
+    const activity = {
+      msg: "your password was changed on " + today
+    };
+    // add activity to user record
+    user.activities.unshift(activity);
+    // save changes
+    await user.save();
   } catch (error) {
     console.error(error);
     res.status(500).send("Server error");
@@ -225,6 +245,7 @@ router.post("/login", async (req, res) => {
     errors.email = "Not Found";
     return res.status(404).json(errors);
   }
+  // log activity
 
   // Password Validation Strategy
   const pasMatch = bcrypt.compare(password, user.password);
@@ -237,6 +258,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: 3600 },
       (error, token) => {
         if (error) throw error;
+
         res.json({
           message: "You are Logged In",
           user: {
@@ -252,24 +274,40 @@ router.post("/login", async (req, res) => {
     errors.password = "Password incorrect";
     return res.status(400).json(errors);
   }
+
+  // log activity
+  const activity = {
+    msg: "your last login was on " + user.updatedAt
+  };
+
+  user.activities.unshift(activity);
+
+  // save
+  await user.save();
+  console.log(user);
 });
 
 // @route   GET api/user
 // @desc    Check Auth User
 // @access  Private
 router.get("/", authenticate, async (req, res) => {
-  User.findById(req.user.id)
-    .select("-password")
-    .then(user =>
-      res.json({
-        message: "You are still Logged In",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email
-        }
-      })
-    );
+  try {
+    User.findById(req.user.id)
+      .select("-password")
+      .then(user =>
+        res.json({
+          message: "You are still Logged In",
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        })
+      );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "server error" });
+  }
 });
 
 // @route   GET api/user/:id
@@ -277,10 +315,9 @@ router.get("/", authenticate, async (req, res) => {
 // @access  Public
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.params.id });
+    const user = await User.findById(req.params.id);
 
-    const profile = await Profile.findOne({ user: user.id }).populate("User");
-
+    console.log(user);
     if (!user) {
       res.status(400).json({ msg: "User not found" });
     } else {
@@ -288,13 +325,11 @@ router.get("/:id", async (req, res) => {
         user,
         request: {
           type: "get",
-          url: "http://localhost:5000/api/account/" + profile.id
-        },
-        profile
+          url: "http://localhost:5000/api/account/"
+        }
       });
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
 });

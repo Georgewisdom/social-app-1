@@ -36,7 +36,13 @@ const UserSchema = new mongoose.Schema({
   passwordResetExpires: {
     type: Date
   },
-  posts: mongoose.Schema.Types.Array
+  posts: [
+    {
+      ref: "Post",
+      type: mongoose.Schema.Types.Array
+    }
+  ],
+  activities: []
 });
 UserSchema.plugin(timestamps);
 module.exports = User = mongoose.model("User", UserSchema);
