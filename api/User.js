@@ -327,6 +327,10 @@ router.get("/:id", async (req, res) => {
           type: "get",
           url: "http://localhost:5000/api/account/"
         }
+
+          url: "http://localhost:5000/api/account/" + profile.id
+        },
+        profile
       });
     }
   } catch (error) {
