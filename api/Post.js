@@ -71,6 +71,7 @@ router.get("/user", authenticate, async (req, res) => {
       res.json({ msg: "you have no post" });
     } else {
       res.status(200).json({
+
         posts
       });
     }
@@ -296,7 +297,7 @@ router.post(
       res.status(200).json(post.comments);
     } catch (error) {
       console.error(error.message);
-      res.status(500).json({ msg: "server error" });
+      createdPost;
     }
   }
 );

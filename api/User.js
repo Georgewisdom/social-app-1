@@ -350,4 +350,51 @@ router.post("/login", async (req, res) => {
   console.log(user);
 });
 
+// @route   GET api/user
+// @desc    Check Auth User
+// @access  Private
+router.get("/", authenticate, async (req, res) => {
+  try {
+    User.findById(req.user.id)
+      .select("-password")
+      .then(user =>
+        res.json({
+          message: "You are still Logged In",
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        })
+      );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "server error" });
+  }
+});
+
+// @route   GET api/user/:id
+// @desc    GET User by ID
+// @access  Public
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    console.log(user);
+    if (!user) {
+      res.status(400).json({ msg: "User not found" });
+    } else {
+      res.status(200).json({
+        user,
+        request: {
+          type: "get",
+          url: "http://localhost:5000/api/account/"
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = router;
