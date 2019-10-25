@@ -84,3 +84,16 @@ import { Mongoose } from "mongoose";
     ]
   }
 ];
+
+
+/*
+like a post 
+
+1.  check if the user has liked the post before
+2.  check if the user has hated the post before
+3.  
+4.  
+
+
+
+*/

@@ -10,11 +10,11 @@ A moderator app that grabs post from instagram for people
 
 ### USER
 
-	~~1. user login~~
-	~~2. user registration~~
-	~~3. user verification~~
-	~~4. user reset password~~
-	~~5. user change email~~
+    ~~1. user login~~
+    ~~2. user registration~~
+    ~~3. user verification~~
+    ~~4. user reset password~~
+    ~~5. user change email~~
 
 ### Profile
 

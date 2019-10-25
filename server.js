@@ -32,4 +32,3 @@ server.use("/api/newsfeed", require("./api/Newsfeed"));
 
 // Config
 server.listen(config.get("port"), () => console.log("server process runing"));
-

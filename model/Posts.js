@@ -47,6 +47,19 @@ const postSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true
+  },
+  follow: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    }
+  ],
+  followCount: {
+    type: Number,
+    required: false,
+    default: 0
   }
 });
 

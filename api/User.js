@@ -12,6 +12,21 @@ const validateLoginInput = require("../validation/login");
 const validateForgetInput = require("../validation/forgetPassword");
 const validateResetInput = require("../validation/resetPassword");
 
+// @route   GET api/user/records
+// @desc    GET User Records of Activities
+// @access  Private
+router.get("/activity", authenticate, async (req, res) => {
+  try {
+    // get current user
+    const user = await User.findOne({ _id: req.user.id });
+    // response
+    res.status(200).json(user.activities);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ msg: "Server Error" });
+  }
+});
+
 // @route   GET api/user/register
 // @desc    Register New User
 // @access  Public
@@ -226,6 +241,53 @@ router.post("/resetpassword/:passwordResetToken", async (req, res) => {
   }
 });
 
+// @route   GET api/user
+// @desc    Check Auth User
+// @access  Private
+router.get("/", authenticate, async (req, res) => {
+  try {
+    User.findById(req.user.id)
+      .select("-password")
+      .then(user =>
+        res.json({
+          message: "You are still Logged In",
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        })
+      );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "server error" });
+  }
+});
+
+// @route   GET api/user/:id
+// @desc    GET User by ID
+// @access  Public
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    console.log(user);
+    if (!user) {
+      res.status(400).json({ msg: "User not found" });
+    } else {
+      res.status(200).json({
+        user,
+        request: {
+          type: "get",
+          url: "http://localhost:5000/api/account/"
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 // @route   GET api/user/login
 // @desc    Register New User
 // @access  Public
@@ -274,10 +336,11 @@ router.post("/login", async (req, res) => {
     errors.password = "Password incorrect";
     return res.status(400).json(errors);
   }
-
+  // new date
+  let today = new Date().toLocaleDateString();
   // log activity
   const activity = {
-    msg: "your last login was on " + user.updatedAt
+    msg: "your last login was on " + today
   };
 
   user.activities.unshift(activity);
@@ -285,53 +348,6 @@ router.post("/login", async (req, res) => {
   // save
   await user.save();
   console.log(user);
-});
-
-// @route   GET api/user
-// @desc    Check Auth User
-// @access  Private
-router.get("/", authenticate, async (req, res) => {
-  try {
-    User.findById(req.user.id)
-      .select("-password")
-      .then(user =>
-        res.json({
-          message: "You are still Logged In",
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email
-          }
-        })
-      );
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "server error" });
-  }
-});
-
-// @route   GET api/user/:id
-// @desc    GET User by ID
-// @access  Public
-router.get("/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-
-    console.log(user);
-    if (!user) {
-      res.status(400).json({ msg: "User not found" });
-    } else {
-      res.status(200).json({
-        user,
-        request: {
-          type: "get",
-          url: "http://localhost:5000/api/account/"
-        }
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
 });
 
 module.exports = router;
