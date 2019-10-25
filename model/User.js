@@ -42,7 +42,8 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.Array
     }
   ],
-  activities: []
+  activities: [],
+  notifications: []
 });
 UserSchema.plugin(timestamps);
 module.exports = User = mongoose.model("User", UserSchema);

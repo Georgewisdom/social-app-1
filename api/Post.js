@@ -116,34 +116,39 @@ router.get("/user", authenticate, async (req, res) => {
 });
 
 // @route    DELETE api/posts/remove/:id
-// @desc     delete post
+// @desc     delete my post
 // @access   Private
 router.delete("/remove/:id", authenticate, async (req, res) => {
   try {
-    // get current post
+    // get post
     const post = await Post.findById(req.params.id);
-    // get current user
-    const user = await User.findById(req.user.id).select("-password");
-    // filter list
-    if (post.user.id == user.id) {
-      res.status(401).json({ msg: "Unauthorized access" });
+    // get user
+    const user = await User.findById(req.user.id);
+    // check for post existence
+    if (!post) {
+      res.status(404).json({ msg: "Not Post Found" });
     }
-    const deletedPost = await post.remove();
-    // add activity log
+    // check the current user
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+    // remove post
+    const removedPost = await post.remove();
+
+    // add to activities
     const activity = {
-      msg: "you deleted this post",
-      post: [deletedPost.id, deletedPost.title]
+      msg: "you deleted your post",
+      post: [removedPost.id, removedPost.title]
     };
-    // add activity to user records
+    // add to user records
     user.activities.unshift(activity);
-    // save the changes
+    // save changes
     await user.save();
-    // send response
-    res.status(200).json({
-      msg: "deleted"
-    });
+
+    // response
+    res.status(202).json({ msg: "Post Removed" });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.status(500).json({ msg: "Server Error" });
   }
 });
@@ -292,13 +297,71 @@ router.post(
       res.status(200).json(post.comments);
     } catch (error) {
       console.error(error.message);
-        createdPost
-      });
-    } catch (error) {
-
-      res.status(500).json({ msg: "server error" });
+      createdPost;
     }
   }
 );
+
+// @route    DELETE api/posts/comment/:postId/:commentId
+// @desc     Delete my comment
+// @access   Private
+router.delete("/comment/:postId/:commentId", authenticate, async (req, res) => {
+  try {
+    // get post
+    const post = await Post.findById(req.params.postId);
+    // get user
+    const user = await User.findById(req.user.id);
+    // Pull out comment
+    const comment = post.comments.find(
+      comment => comment.id === req.params.commentId
+    );
+
+    // Make sure comment exists
+    if (!comment) {
+      return res.status(404).json({ msg: "Comment Not Found" });
+    }
+
+    // Check user
+    if (comment.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+
+    // Get/Remove index
+    const removeIndex = post.comments
+      .map(comment => comment.id)
+      .indexOf(req.params.commentId);
+
+    post.comments.splice(removeIndex, 1);
+
+    await post.save();
+    // add to user activity
+    const activity = {
+      msg: "comment deleted by you"
+    };
+    // add to user records
+    user.activities.unshift(activity);
+    // save changes
+    await user.save();
+    res.json(post.comments);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route    GET api/post/:id
+// @desc     get post by id
+// @access   Private
+router.get("/:id", async (req, res) => {
+  try {
+    // get post
+    const post = await Post.findById(req.params.id);
+    // response
+    res.status(200).json(post);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "server error" });
+  }
+});
 
 module.exports = router;
