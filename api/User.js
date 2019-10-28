@@ -347,7 +347,7 @@ router.post("/login", async (req, res) => {
 
   // save
   await user.save();
-  console.log(user);
+ 
 });
 
 // @route   GET api/user
