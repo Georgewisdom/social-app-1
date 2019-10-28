@@ -86,9 +86,7 @@ router.get("/user", authenticate, async (req, res) => {
 // @access   Private
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find({})
-      .sort({ date: 1 })
-      .populate("user");
+    const posts = await Post.find({}).sort({ date: 1 });
 
     res.status(200).json(posts);
   } catch (error) {
@@ -279,10 +277,25 @@ router.post(
 
       // Add created comment to list of comments
       post.comments.unshift(createdComment);
+      // get posts followers
+      const followers = post.follow.map(fol => {
+        return fol.user;
+      });
 
       // then saved the post with the changes made
       await post.save();
 
+      followers.map(async follower => {
+        const user = await User.find({ _id: follower });
+        user.map(async use => {
+          use.notifications.unshift({
+            msg: "some one commented on a post you followed",
+            post: [post.id, post.title]
+          });
+          await use.save();
+          console.log(use);
+        });
+      });
       // activity log
       const activity = {
         msg: "you commented on this post",
@@ -297,7 +310,6 @@ router.post(
       res.status(200).json(post.comments);
     } catch (error) {
       console.error(error.message);
-      createdPost;
     }
   }
 );
@@ -361,6 +373,77 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "server error" });
+  }
+});
+
+// @route    PUT api/posts/follow/:postId
+// @desc     Follow A Post
+// @access   Protected
+router.put("/follow/:id", authenticate, async (req, res) => {
+  try {
+    // get post
+    const post = await Post.findById(req.params.id);
+    // get user
+    const user = await User.findById(req.user.id);
+    // check if user has followed post before
+    if (
+      post.follow.filter(fol => fol.user.toString() === req.user.id).length > 0
+    ) {
+      return res.status(400).json({ msg: "already followed" });
+    }
+
+    // add user to post follow
+    const followedPost = post.follow.unshift({ user: req.user.id });
+    post.followCount += 1;
+    // save post changes
+    await post.save();
+    // add to user activity
+    const activity = {
+      msg: "you followed this post",
+      post: [post.id, post.name]
+    };
+    // add to user record
+    user.activities.unshift(activity);
+    // save user changes
+    user.save();
+    res.status(200).json({
+      postFollow: post.follow
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "server error" });
+  }
+});
+
+// @route    PUT api/posts/hate/:id
+// @desc     hate a post
+// @access   Private
+router.put("/unfollow/:id", authenticate, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    // Check
+    if (
+      post.follow.filter(fol => fol.user.toString() === req.user.id).length ===
+      0
+    ) {
+      return res.status(400).json({ msg: "You have not followed yet" });
+    }
+
+    // Get/Remove index
+    const removeIndex = post.follow
+      .map(fol => fol.user.toString())
+      .indexOf(req.user.id);
+
+    post.follow.splice(removeIndex, 1);
+    post.followCount -= 1;
+    console.log(post);
+    await post.save();
+
+    res.json(post.follow);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
   }
 });
 
