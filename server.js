@@ -28,6 +28,7 @@ server.use("/api/user", require("./api/User"));
 server.use("/api/account", require("./api/Profile"));
 server.use("/api/posts", require("./api/Post"));
 server.use("/api/newsfeed", require("./api/Newsfeed"));
+server.use("/api/message", require("./api/Message"));
 //
 
 // Config

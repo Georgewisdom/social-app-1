@@ -81,19 +81,27 @@ import { Mongoose } from "mongoose";
           type: String
         }
       }
+    ],
+    messages: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "Users"
+        },
+        message: {
+          type: String,
+          required: true
+        }
+      }
     ]
   }
 ];
-
 
 /*
 like a post 
 
 1.  check if the user has liked the post before
 2.  check if the user has hated the post before
-3.  
-4.  
-
-
+3.
 
 */
