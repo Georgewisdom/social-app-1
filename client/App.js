@@ -5,73 +5,48 @@
  * @format
  * @flow
  */
+import React, {Component, useEffect} from 'react';
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
-import moduleName from './src/components/Header';
-// import {
-//   Header,
-//   LearnMoreLinks,
-//   Colors,
-//   DebugInstructions,
-//   ReloadInstructions,
-// } from 'react-native/Libraries/NewAppScreen';
+// react navigate
 
-const App : () => React$Node = () => {
+import {NativeRouter, Switch, Route} from 'react-router-native';
+
+import Login from './src/screens/Login';
+import Signup from './src/screens/SignUp';
+import ForgetPassword from './src/screens/ForgotPassword.js';
+import Welcome from './src/screens/Welcome';
+import Posts from './src/components/posts';
+// redux implimentation
+import store from './store';
+import {Provider} from 'react-redux';
+import authToken from './src/utils/authToken';
+import {AsyncStorage} from 'react-native';
+import {getUser} from './src/actions/auth';
+
+// check auth status
+if (AsyncStorage.token) {
+  authToken(AsyncStorage.token);
+}
+const App = () => {
+  useEffect(() => {
+    store.dispatch(getUser);
+  }, []);
+
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-       <Header />
-      </SafeAreaView>
-    </>
+    <Provider store={store}>
+      <NativeRouter>
+        <Switch>
+          <Route exact path="/" component={Welcome} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/register" component={Signup} />
+          <Route exact path="/forget" component={ForgetPassword} />
+        </Switch>
+        {/* <Switch>
+          <Route extact path="/" component={Posts} />
+        </Switch> */}
+      </NativeRouter>
+    </Provider>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
 
 export default App;

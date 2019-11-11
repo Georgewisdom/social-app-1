@@ -289,7 +289,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // @route   GET api/user/login
-// @desc    Register New User
+// @desc    Login User
 // @access  Public
 router.post("/login", async (req, res) => {
   // Validation
@@ -347,7 +347,6 @@ router.post("/login", async (req, res) => {
 
   // save
   await user.save();
- 
 });
 
 // @route   GET api/user

@@ -3,7 +3,7 @@ const config = require("config");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-
+const cors = require("cors");
 // Init App
 const server = express();
 
@@ -22,7 +22,15 @@ mongoose
 server.use(morgan("dev"));
 server.use(bodyParser.json());
 server.use(express.urlencoded({ extended: false }));
-
+server.use(cors());
+server.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 // Routes
 server.use("/api/user", require("./api/User"));
 server.use("/api/account", require("./api/Profile"));
