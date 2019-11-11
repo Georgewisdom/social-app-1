@@ -54,11 +54,11 @@ A moderator app that grabs post from instagram for people
 
 ### Messaging
 
-    1. User to user messaging request
-    2. accept the messaging request
-    3. delete messaging request
-    4. block messaging
-    5 report user
+    1. send message request to a user
+    2. reply message request
+    3. remove message request
+    4. block user from messaging
+    5. report user
 
 ### Business
 

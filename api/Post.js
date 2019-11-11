@@ -244,7 +244,7 @@ router.put("/hate/:id", authenticate, async (req, res) => {
 });
 
 // @route    POST api/posts/comment/:postId
-// @desc     write to a post
+// @desc     write comment to a post
 // @access   Protected
 router.post(
   "/comment/:postId",
@@ -415,7 +415,7 @@ router.put("/follow/:id", authenticate, async (req, res) => {
   }
 });
 
-// @route    PUT api/posts/hate/:id
+// @route    PUT api/posts/unfollow/:id
 // @desc     hate a post
 // @access   Private
 router.put("/unfollow/:id", authenticate, async (req, res) => {
