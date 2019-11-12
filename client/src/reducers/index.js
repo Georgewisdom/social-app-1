@@ -1,8 +1,8 @@
 import {combineReducers} from 'redux';
 import authReducer from './authReducer';
-
-const INITIAL_STATE = {};
+import posts from './posts';
 
 export default combineReducers({
   auth: authReducer,
+  post: posts,
 });

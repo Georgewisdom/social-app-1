@@ -5,17 +5,10 @@
  * @format
  * @flow
  */
-import React, {Component, useEffect} from 'react';
-
-// react navigate
-
-import {NativeRouter, Switch, Route} from 'react-router-native';
-
-import Login from './src/screens/Login';
-import Signup from './src/screens/SignUp';
-import ForgetPassword from './src/screens/ForgotPassword.js';
+import React, {useEffect} from 'react';
+import {NativeRouter, Route} from 'react-router-native';
 import Welcome from './src/screens/Welcome';
-import Posts from './src/components/posts';
+import Routes from './src/components/routing/Routes';
 // redux implimentation
 import store from './store';
 import {Provider} from 'react-redux';
@@ -35,15 +28,8 @@ const App = () => {
   return (
     <Provider store={store}>
       <NativeRouter>
-        <Switch>
-          <Route exact path="/" component={Welcome} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Signup} />
-          <Route exact path="/forget" component={ForgetPassword} />
-        </Switch>
-        {/* <Switch>
-          <Route extact path="/" component={Posts} />
-        </Switch> */}
+        <Route exact path="/" component={Welcome} />
+        <Route component={Routes} />
       </NativeRouter>
     </Provider>
   );

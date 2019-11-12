@@ -8,8 +8,14 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useHistory} from 'react-router-native';
-const Welcome = () => {
-  const history = useHistory();
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import {Link, Redirect} from 'react-router-native';
+const Welcome = ({isAuthenticated}) => {
+  if (isAuthenticated) {
+    return <Redirect to="/posts" />;
+  }
+
   return (
     <View style={styles.root}>
       <View style={styles.backgroundImage1}>
@@ -26,21 +32,25 @@ const Welcome = () => {
             <Text style={styles.withMilionsOfUser}>
               With Millions of people
             </Text>
-            <TouchableOpacity onPress={() => history.push('/login')}>
+            <TouchableOpacity>
               <View style={styles.buttonLoginCopy}>
                 <View style={styles.rectangle1}>
-                  <Text style={styles.logIn}>Log In</Text>
+                  <Link to="/login">
+                    <Text style={styles.logIn}>Log In</Text>
+                  </Link>
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => history.push('/register')}>
+            <TouchableOpacity>
               <View style={styles.buttonLogin}>
                 <LinearGradient
                   start={{x: 0, y: 0}}
                   end={{x: 1, y: 0}}
                   colors={['#b52605', '#c98206']}
                   style={styles.rectangle}>
-                  <Text style={styles.signUp}>Sign Up</Text>
+                  <Link to="/register">
+                    <Text style={styles.signUp}>Sign Up</Text>
+                  </Link>
                 </LinearGradient>
               </View>
             </TouchableOpacity>
@@ -56,7 +66,15 @@ const Welcome = () => {
   );
 };
 
-export default Welcome;
+Welcome.PropTypes = {
+  isAuthenticated: PropTypes.bool,
+};
+
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps)(Welcome);
 
 const styles = StyleSheet.create({
   root: {
