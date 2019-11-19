@@ -10,57 +10,54 @@ import {
   ScrollView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-
+import {Link} from 'react-router-native';
 export default class ForgotPassword extends Component {
-  static navigationOptions = {
-    header:null
-  }
   render() {
     return (
       <ScrollView>
-      <View style={styles.root}>
-        <View style={styles.backgroundImage1}>
-          <ImageBackground
-            source={require('../assets/images/forgot/2c329a00dbb7be1a54b4736a98085241238b4126.png')}
-            resizeMode="cover"
-            style={styles.backgroundImage}>
+        <View style={styles.root}>
+          <View style={styles.backgroundImage1}>
             <ImageBackground
-              style={styles.bgDark}
-              source={require('../assets/images/forgot/Gradient_IoglENv.png')}>
-              <Text style={styles.text}>Forgot password</Text>
-              <Text style={styles.pleaseEnterYourEm}>
-                Please enter your email address. You will receive a link to
-                create a new password via email.
-              </Text>
-              <View style={styles.rectangleCopy2}>
-                <TextInput
-                  style={styles.yourEmail}
-                  placeholder="Your Email"
-                  placeholderTextColor="white"
-                />
-              </View>
-              <TouchableOpacity>
-                <View style={styles.buttonLogin}>
-                  <LinearGradient
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    colors={['#b52605', '#c98206']}
-                    style={styles.rectangle}>
-                    <Text style={styles.send}>Send</Text>
-                  </LinearGradient>
+              source={require('../assets/images/forgot/2c329a00dbb7be1a54b4736a98085241238b4126.png')}
+              resizeMode="cover"
+              style={styles.backgroundImage}>
+              <ImageBackground
+                style={styles.bgDark}
+                source={require('../assets/images/forgot/Gradient_IoglENv.png')}>
+                <Text style={styles.text}>Forgot password</Text>
+                <Text style={styles.pleaseEnterYourEm}>
+                  Please enter your email address. You will receive a link to
+                  create a new password via email.
+                </Text>
+                <View style={styles.rectangleCopy2}>
+                  <TextInput
+                    style={styles.yourEmail}
+                    placeholder="Your Email"
+                    placeholderTextColor="white"
+                  />
                 </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('Welcome')}
-              >
-                <View style={styles.continue}>
-                  <Text style={styles.tcont}>Go Back</Text>
-                </View>
-              </TouchableOpacity>
+                <TouchableOpacity>
+                  <View style={styles.buttonLogin}>
+                    <LinearGradient
+                      start={{x: 0, y: 0}}
+                      end={{x: 1, y: 0}}
+                      colors={['#b52605', '#c98206']}
+                      style={styles.rectangle}>
+                      <Text style={styles.send}>Send</Text>
+                    </LinearGradient>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <Link to="/">
+                    <View style={styles.continue}>
+                      <Text style={styles.tcont}>Go Back</Text>
+                    </View>
+                  </Link>
+                </TouchableOpacity>
+              </ImageBackground>
             </ImageBackground>
-          </ImageBackground>
+          </View>
         </View>
-      </View>
       </ScrollView>
     );
   }
@@ -151,7 +148,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 2,
   },
-  tcont:{
+  tcont: {
     backgroundColor: 'transparent',
     color: 'rgba(255,255,255,1)',
     fontSize: 15,

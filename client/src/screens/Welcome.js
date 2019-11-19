@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {useHistory} from 'react-router-native';
+import {useHistory, Link} from 'react-router-native';
 const Welcome = () => {
-  const history = useHistory();
   return (
     <View style={styles.root}>
       <View style={styles.backgroundImage1}>
@@ -21,33 +20,39 @@ const Welcome = () => {
             style={styles.bgCopy}
             source={require('../assets/images/Gradient.png')}>
             <Text style={styles.findNewFriendsNea}>
-              Find new friends nearby
+              Connect With Businesses both
             </Text>
             <Text style={styles.withMilionsOfUser}>
-              With Millions of people
+              International & National
             </Text>
-            <TouchableOpacity onPress={() => history.push('/login')}>
-              <View style={styles.buttonLoginCopy}>
-                <View style={styles.rectangle1}>
-                  <Text style={styles.logIn}>Log In</Text>
+            <TouchableOpacity>
+              <Link to="/login">
+                <View style={styles.buttonLoginCopy}>
+                  <View style={styles.rectangle1}>
+                    <Text style={styles.logIn}>Log In</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => history.push('/register')}>
-              <View style={styles.buttonLogin}>
-                <LinearGradient
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 0}}
-                  colors={['#b52605', '#c98206']}
-                  style={styles.rectangle}>
-                  <Text style={styles.signUp}>Sign Up</Text>
-                </LinearGradient>
-              </View>
+              </Link>
             </TouchableOpacity>
             <TouchableOpacity>
-              <View style={styles.continue}>
-                <Text style={styles.tcont}>Continue without an account</Text>
-              </View>
+              <Link to="/register">
+                <View style={styles.buttonLogin}>
+                  <LinearGradient
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 0}}
+                    colors={['#b52605', '#c98206']}
+                    style={styles.rectangle}>
+                    <Text style={styles.signUp}>Sign Up</Text>
+                  </LinearGradient>
+                </View>
+              </Link>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Link to="/posts">
+                <View style={styles.continue}>
+                  <Text style={styles.tcont}>Continue without an account</Text>
+                </View>
+              </Link>
             </TouchableOpacity>
           </ImageBackground>
         </ImageBackground>

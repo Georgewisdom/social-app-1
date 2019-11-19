@@ -11,110 +11,146 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import DatePicker from 'react-native-datepicker';
-// import DateTimePicker from '@react-native-community/datetimepicker';
+import {useHistory, Link} from 'react-router-native';
+import {Redirect} from 'react-router-native';
+// redux
+import {connect} from 'react-redux';
+import {registerUser} from '../actions/auth';
+import PropTypes from 'prop-types';
+class SignUp extends Component {
+  constructor(props) {
+    super(props);
 
-export default class SignUp1 extends Component {
-  static navigationOptions = {
-    header:null
+    this.state = {
+      name: '',
+      email: '',
+      password: '',
+    };
   }
   render() {
+    // if (this.props.auth.isAuthenticated) {
+    //   return <Redirect to="/login" />;
+    // }
+
+    const {name, email, password} = this.state;
+
     return (
       <ScrollView>
-      <View style={styles.root}>
-        <View style={styles.backgroundImage1}>
-          <ImageBackground
-            source={require('../assets/images/signup/3642ce19efbfc07574d1dbc834ef0c7bc505a6de.png')}
-            resizeMode="cover"
-            style={styles.backgroundImage}>
+        <View style={styles.root}>
+          <View style={styles.backgroundImage1}>
             <ImageBackground
-              style={styles.bgDark}
-              source={require('../assets/images/signup/Gradient_YiPX0gn.png')}>
-              <Text style={styles.createAnAccount}>Create an account</Text>
-              <View style={styles.rectangleCopy3}>
-                <TextInput
-                  style={styles.username}
-                  autoCompleteType="off"
-                  placeholder="Username"
-                  placeholderTextColor="white"
-                />
-              </View>
-              <View style={styles.rectangleCopy4}>
-                <TextInput
-                  style={styles.email}
-                  autoCompleteType="email"
-                  placeholder="Email"
-                  placeholderTextColor="white"
-                  keyboardType="email-address"
-                />
-              </View>
-              <View style={styles.rectangleCopy8}>
-                <TextInput
-                  style={styles.phone}
-                  autoCompleteType="tel"
-                  placeholder="Phone"
-                  keyboardType="phone-pad"
-                  placeholderTextColor="white"
-                />
-              </View>
-              <View style={styles.rectangleCopy9}>
-                <DatePicker
-                  style={styles.dateOfBirth}
-                  placeholder="Date of birth"
-                  placeholderTextColor="white"
-                  customStyles={{
-                    dateIcon: {
-                      display: 'none',
-                    },
-                    dateInput: {
-                      borderColor: 'transparent',
-                      fontSize: 17,
-                      alignSelf: 'center',
-                    },
-                  }}
-                />
-
-              </View>
-              <View style={styles.rectangleCopy10}>
-                <TextInput
-                  style={styles.password}
-                  placeholder="Password"
-                  placeholderTextColor="white"
-                  dataDetectorTypes="password"
-                  secureTextEntry={true}
-                />
-              </View>
-              <TouchableOpacity>
-                <View style={styles.buttonLogin}>
-                  <LinearGradient
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    colors={['#b52605', '#c98206']}
-                    style={styles.rectangle}>
-                    <Text style={styles.signUp}>Sign Up</Text>
-                  </LinearGradient>
+              source={require('../assets/images/signup/3642ce19efbfc07574d1dbc834ef0c7bc505a6de.png')}
+              resizeMode="cover"
+              style={styles.backgroundImage}>
+              <ImageBackground
+                style={styles.bgDark}
+                source={require('../assets/images/signup/Gradient_YiPX0gn.png')}>
+                <View>
+                  {this.props.auth.isAuthenticated !== null && (
+                    <Text style={styles.createAnAccount}>
+                      {this.props.auth.msg.message}{' '}
+                    </Text>
+                  )}
                 </View>
-              </TouchableOpacity>
-              <TouchableOpacity>
-              <Text 
-                style={styles.signin}
-                onPress={() => this.props.navigation.navigate('Login')}
-              >
-                Hava an account? Log in
+                <Text style={styles.createAnAccount}>Create an account</Text>
+                <View style={styles.rectangleCopy3}>
+                  <TextInput
+                    style={styles.username}
+                    autoCompleteType="off"
+                    placeholder="Username"
+                    placeholderTextColor="white"
+                    onChangeText={name => this.setState({name})}
+                  />
+                </View>
+                <View style={styles.rectangleCopy4}>
+                  <TextInput
+                    style={styles.email}
+                    autoCompleteType="email"
+                    placeholder="Email"
+                    placeholderTextColor="white"
+                    keyboardType="email-address"
+                    onChangeText={email => this.setState({email})}
+                  />
+                </View>
+                <View style={styles.rectangleCopy8}>
+                  <TextInput
+                    style={styles.phone}
+                    autoCompleteType="tel"
+                    placeholder="Phone"
+                    keyboardType="phone-pad"
+                    placeholderTextColor="white"
+                  />
+                </View>
+                <View style={styles.rectangleCopy9}>
+                  <DatePicker
+                    style={styles.dateOfBirth}
+                    placeholder="Date of birth"
+                    placeholderTextColor="white"
+                    customStyles={{
+                      dateIcon: {
+                        display: 'none',
+                      },
+                      dateInput: {
+                        borderColor: 'transparent',
+                        fontSize: 17,
+                        alignSelf: 'center',
+                      },
+                    }}
+                  />
+                </View>
+                <View style={styles.rectangleCopy10}>
+                  <TextInput
+                    style={styles.password}
+                    placeholder="Password"
+                    placeholderTextColor="white"
+                    dataDetectorTypes="password"
+                    secureTextEntry={true}
+                    onChangeText={password => this.setState({password})}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.registerUser({name, email, password});
+                  }}>
+                  <View style={styles.buttonLogin}>
+                    <LinearGradient
+                      start={{x: 0, y: 0}}
+                      end={{x: 1, y: 0}}
+                      colors={['#b52605', '#c98206']}
+                      style={styles.rectangle}>
+                      <Text style={styles.signUp}>Sign Up</Text>
+                    </LinearGradient>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <Link to="/login">
+                    <Text style={styles.signin}>Hava an account? Log in</Text>
+                  </Link>
+                </TouchableOpacity>
+
+                <Text style={styles.byClickingSignUp}>
+                  By clicking Sign up you agree to the following Terms and
+                  Conditions without reservation
                 </Text>
-              </TouchableOpacity>
-              
-              <Text style={styles.byClickingSignUp}>
-                By clicking Sign up you agree to the following Terms and
-                Conditions without reservation
-              </Text>
+              </ImageBackground>
             </ImageBackground>
-          </ImageBackground>
+          </View>
         </View>
-      </View>
       </ScrollView>
     );
   }
 }
+
+SignUp.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object,
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps, {registerUser})(SignUp);
 
 const styles = StyleSheet.create({
   root: {

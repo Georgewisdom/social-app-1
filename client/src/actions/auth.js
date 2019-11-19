@@ -6,30 +6,29 @@ import {
   LOGIN_FAIL,
   AUTH_FAILED,
   LOGIN_SUCCESS,
+  LOGOUT_SUCCESS,
 } from './constants';
-import {AsyncStorage} from 'react-native';
+import {setAlert} from './alert';
 import authToken from '../utils/authToken';
-
+import {AsyncStorage} from 'react-native';
 // Load Current  User
-export const getUser = () => async dispatch => {
-  if (AsyncStorage.token) {
-    authToken(AsyncStorage.token);
-  }
-
+export const getUser = () => async (dispatch, getState) => {
   try {
-    await fetch('http://192.168.8.103:5000/api/user')
-      .then(res => res.json())
-      .then(data => {
-        dispatch({
-          type: USER_LOADED,
-          payload: data,
-        });
-      });
+    const res = await axios.get(
+      'http://192.168.8.101:5000/api/user',
+      tokenConfig(getState),
+    );
+    console.log('action' + config.headers['x-auth-token']);
+    dispatch({
+      type: USER_LOADED,
+      payload: res.data,
+    });
+    console.log('load user' + res.data);
   } catch (error) {
     dispatch({
       type: AUTH_FAILED,
+      payload: error,
     });
-    console.error('error occured');
   }
 };
 
@@ -44,19 +43,21 @@ export const registerUser = ({name, email, password}) => async dispatch => {
   const body = JSON.stringify({name, email, password});
 
   try {
-    const res = await axios.post('/api/user/register', body, config);
+    const res = await axios.post(
+      'http://192.168.8.101:5000/api/user/register',
+      body,
+      config,
+    );
 
     dispatch({
       type: REGISTER_SUCCESS,
       payload: res.data,
     });
-
-    dispatch(getUser());
   } catch (error) {
     const errors = error.response.data.errors;
 
     if (errors) {
-      throw errors;
+      errors.forEach(error => dispatch(setAlert(error.msg, 'danger')));
     }
 
     dispatch({
@@ -65,7 +66,7 @@ export const registerUser = ({name, email, password}) => async dispatch => {
   }
 };
 
-export const loginUser = ({email, password}) => async dispatch => {
+export const login = ({email, password}) => async dispatch => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -73,34 +74,58 @@ export const loginUser = ({email, password}) => async dispatch => {
   };
 
   const body = JSON.stringify({email, password});
-
+  console.log(body);
   try {
-    await fetch('http://192.168.8.103:5000/api/user/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body,
-    })
-      .then(res => res.json())
-      .then(data => {
-        dispatch({
-          type: LOGIN_SUCCESS,
-          payload: data,
-        });
-        console.log(data);
-      });
+    const res = await axios.post(
+      'http://192.168.8.101:5000/api/user/login',
+      body,
+      config,
+    );
+
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: res.data,
+    });
+
+    console.log('login auth' + res.data.token);
 
     dispatch(getUser());
   } catch (error) {
     const errors = error.response.data.errors;
 
     if (errors) {
-      throw errors;
+      errors.forEach(error => dispatch(setAlert(error.msg, 'danger')));
     }
 
     dispatch({
       type: LOGIN_FAIL,
     });
   }
+};
+
+export const logout = () => {
+  return {
+    type: LOGOUT_SUCCESS,
+  };
+};
+
+// Setup config/headers and token
+export const tokenConfig = getState => {
+  // Get token from localstorage
+  const token = getState().auth.token;
+
+  const config = {
+    headers: {
+      'Content-type': 'application/json',
+      'x-auth-token': token,
+    },
+  };
+
+  // Headers
+
+  // If token, add to headers
+
+  console.log(config.headers['x-auth-token'] + 'from tokenConfig');
+
+  return config;
 };

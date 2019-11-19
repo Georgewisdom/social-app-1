@@ -10,11 +10,15 @@ import {
   TouchableOpacity,
   ScrollView,
   Button,
+  ActivityIndicator,
 } from 'react-native';
 // redux
 import PropTypes from 'prop-types';
-import {loginUser} from '../actions/auth';
+import {login} from '../actions/auth';
 import {connect} from 'react-redux';
+import {Redirect, Link} from 'react-router-native';
+// other imports
+import Alerts from '../components/alerts/Alerts';
 
 class Login extends Component {
   constructor(props) {
@@ -28,12 +32,22 @@ class Login extends Component {
     // this.onChangeValue = this.onChangeValue.bind(this);
   }
 
-  if(isAuthenticated) {
-    alert('auth success');
-  }
-
   render() {
+    if (this.props.auth.isAuthenticated) {
+      return <Redirect to="/posts" />;
+    }
+
     const {email, password} = this.state;
+
+    const loadingCheck = () => {
+      return (
+        this.props.auth.isAuthenticated === null && (
+          <View>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )
+      );
+    };
 
     return (
       <ScrollView>
@@ -46,17 +60,20 @@ class Login extends Component {
               <ImageBackground
                 style={styles.bgDark}
                 source={require('../assets/images/login/Gradient_Q6biS3Y.png')}>
+                <View>
+                  <Alerts style={styles.alertStyle} />
+                </View>
                 <Text style={styles.welcomeBack}>Welcome back</Text>
                 <Text style={styles.loginToYourAccoun}>
                   Login to your account
                 </Text>
+
                 <View style={styles.rectangleCopy}>
                   <TextInput
                     style={styles.textInput}
                     placeholder="Email"
                     placeholderTextColor="white"
                     onChangeText={email => this.setState({email})}
-                    value={this.state.email}
                   />
                 </View>
                 <View style={styles.rectangleCopy2}>
@@ -65,12 +82,11 @@ class Login extends Component {
                     placeholder="Password"
                     placeholderTextColor="white"
                     onChangeText={password => this.setState({password})}
-                    value={this.state.password}
                   />
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    loginUser(email, password);
+                    this.props.login({email, password});
                   }}>
                   <View style={styles.buttonLogin}>
                     <LinearGradient
@@ -83,27 +99,31 @@ class Login extends Component {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => this.props.history.push('/')}>
+                <TouchableOpacity>
                   <View style={styles.buttonHome}>
                     <LinearGradient
                       start={{x: 0, y: 0}}
                       end={{x: 1, y: 0}}
                       colors={['#b52605', '#c98206']}
                       style={styles.rectangle}>
-                      <Text style={styles.text}>Go To Home</Text>
+                      <Link to="/">
+                        <Text style={styles.text}>Go To Home</Text>
+                      </Link>
                     </LinearGradient>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => this.props.history.push('/forget')}>
-                  <Text style={styles.forgotYourPassword}>
-                    Forgot your password?
-                  </Text>
+                <TouchableOpacity>
+                  <Link to="/forget">
+                    <Text style={styles.forgotYourPassword}>
+                      Forgot your password?
+                    </Text>
+                  </Link>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={() => this.props.history.push('/register')}>
-                  <Text style={styles.forgotYourPassword}>Sign Up Here</Text>
+                <TouchableOpacity>
+                  <Link to="/forget">
+                    <Text style={styles.forgotYourPassword}>Sign Up Here</Text>
+                  </Link>
                 </TouchableOpacity>
               </ImageBackground>
             </ImageBackground>
@@ -115,18 +135,15 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  loginUser: PropTypes.func.isRequired,
-  isAuthenticated: PropTypes.bool,
+  login: PropTypes.func.isRequired,
+  auth: PropTypes.object,
 };
 
 const mapStateToProps = state => ({
-  isAuthenticated: state.auth.isAuthenticated,
+  auth: state.auth,
 });
 
-export default connect(
-  mapStateToProps,
-  {loginUser},
-)(Login);
+export default connect(mapStateToProps, {login})(Login);
 
 const styles = StyleSheet.create({
   root: {
@@ -285,5 +302,8 @@ const styles = StyleSheet.create({
     width: 375,
     height: 291,
     marginTop: 26,
+  },
+  alertStyle: {
+    color: 'white',
   },
 });

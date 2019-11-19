@@ -19,6 +19,7 @@ mongoose
   .catch(err => console.log(err));
 
 // Middleware
+server.disable("etag");
 server.use(morgan("dev"));
 server.use(bodyParser.json());
 server.use(express.urlencoded({ extended: false }));

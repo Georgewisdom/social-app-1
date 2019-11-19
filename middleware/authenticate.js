@@ -1,23 +1,24 @@
 const jwt = require("jsonwebtoken");
 const config = require("config");
 
-function authenticate(req, res, next) {
-  const token = req.header("auth-token");
+module.exports = async function authenticate(req, res, next) {
+  const token = req.header("x-auth-token");
 
   // Token Validity
   if (!token) {
-    res.status(401).json({ msg: "Invalid token" });
+    return res.status(401).json({ msg: "Invalid token" });
   }
   try {
     // Verify Token
-    const verified = jwt.verify(token, config.get("tokenSecret"));
-
-    // Grant User Access
-    req.user = verified;
-    next();
+    await jwt.verify(token, config.get("tokenSecret"), (error, decoded) => {
+      if (error) {
+        res.status(401).json({ msg: "Token is incorrect" });
+      } else {
+        req.user = decoded;
+        next();
+      }
+    });
   } catch (error) {
-    res.status(400).json({ msg: "Invalid Token" });
+    res.status(500).json({ msg: "Server Error" });
   }
-}
-
-module.exports = authenticate;
+};

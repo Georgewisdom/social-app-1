@@ -4,12 +4,13 @@ const User = require("../model/User");
 const authenticate = require("../middleware/authenticate");
 const { check, validationResult } = require("express-validator");
 
-// @route    POST api/post
+// @route    POST api/posts
 // @desc     create a new post
 // @access   Private
 router.post(
   "/",
   authenticate,
+
   [
     [
       check("title", "title is required")
@@ -37,7 +38,6 @@ router.post(
       const newPost = new Post({
         title: req.body.tile,
         body: req.body.body,
-        user: user,
         category: req.body.category
       });
       const createdPost = await newPost.save();
@@ -84,7 +84,7 @@ router.get("/user", authenticate, async (req, res) => {
 // @route    GET api/posts
 // @desc     get all posts
 // @access   Private
-router.get("/", async (req, res) => {
+router.get("/", authenticate, async (req, res) => {
   try {
     const posts = await Post.find({}).sort({ date: 1 });
 

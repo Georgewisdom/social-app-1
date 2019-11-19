@@ -9,10 +9,9 @@ const { check, validationResult } = require("express-validator");
 // @access   Private
 router.get("/", authenticate, async (req, res) => {
   try {
-    const profile = await Profile.findOne({ user: req.user.id }).populate(
-      "User",
-      ["name"]
-    );
+    const profile = await Profile.findOne({
+      user: req.user.id
+    }).populate("User", ["name"]);
 
     if (!profile) {
       return res.status(400).json({ msg: "Please complete your profile" });

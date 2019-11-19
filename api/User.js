@@ -35,7 +35,7 @@ router.post("/register", async (req, res) => {
 
   // Check Validation
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors: Array.from(errors) });
   }
 
   try {
@@ -43,10 +43,9 @@ router.post("/register", async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (user) {
-      res.status(400).json({
-        errors: [{ msg: "User Already Exist" }]
-      });
+      return res.status(400).json({ errors: [{ msg: "User already exists" }] });
     }
+
     const secretToken = generateRandomString(30);
 
     const newUser = new User({
@@ -78,28 +77,18 @@ router.post("/register", async (req, res) => {
           .save()
           .then(user => {
             res.json({
-              message: "Please verify your email"
+              message: "Account Created, Please verify your email"
             });
           })
-          .catch(err => console.log(err));
+          .catch(err => console.error(err));
       });
     });
 
     mg.messages().send(data, function(error, body) {
       console.log(body);
     });
-    // get date
-    let today = new Date().toLocaleDateString();
-    // add activity
-    const activity = {
-      msg: "your account was created on " + today
-    };
-    // add additivity to user records
-    user.activities.unshift(activity);
-    // save the user
-    await user.save();
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.status(500).send("Server error");
   }
 });
@@ -138,7 +127,7 @@ router.post("/forgetpassword", async (req, res) => {
 
   // Check Validation
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors: errors.array() });
   }
 
   try {
@@ -147,9 +136,9 @@ router.post("/forgetpassword", async (req, res) => {
     const user = await User.findOne({ email });
     // Check for user
     if (!user) {
-      errors.message = "User not found";
-      return res.status(404).json(errors);
+      return res.status(404).json({ errors: [{ msg: "User already exists" }] });
     }
+
     if (user) {
       // create my secret token for resetpasswordtoken
       const resetToken = generateRandomString(36);
@@ -197,10 +186,10 @@ router.post("/forgetpassword", async (req, res) => {
 router.post("/resetpassword/:passwordResetToken", async (req, res) => {
   const { errors, isValid } = validateResetInput(req.body);
   //const passwordResetToken = req.params.passwordResetToken;
-  const { password, password2 } = req.body;
+  const { password } = req.body;
   // Check Validation
-  if (!isValid) {
-    return res.status(400).json(errors);
+  if (!isValid || errors) {
+    return res.status(400).json({ errors: errors.array() });
   }
   try {
     const user = await User.findOne({
@@ -208,14 +197,13 @@ router.post("/resetpassword/:passwordResetToken", async (req, res) => {
       passwordResetExpires: { $gt: Date.now() }
     });
     if (!user) {
-      const passwordResetToken = "This is not our password reset token";
-      return res.status(400).json(passwordResetToken);
+      return res
+        .status(400)
+        .json({ errors: [{ msg: "This is not our password reset token" }] });
     }
 
     if (user.passwordResetToken < Date.now()) {
-      return res
-        .status(400)
-        .json("This password reset token has expire, request a new one");
+      return res.status(400).json({ errors: [{ msg: "Expired token" }] });
     }
 
     if (user) {
@@ -223,7 +211,7 @@ router.post("/resetpassword/:passwordResetToken", async (req, res) => {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
       const save = user.save();
-      return res.status(200).json("Password reset successfull");
+      return res.status(200).json({ msg: "Password reset successfull" });
     }
     // get date
     let today = new Date().toLocaleDateString();
@@ -248,16 +236,8 @@ router.get("/", authenticate, async (req, res) => {
   try {
     User.findById(req.user.id)
       .select("-password")
-      .then(user =>
-        res.json({
-          message: "You are still Logged In",
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email
-          }
-        })
-      );
+      .then(user => res.json(user));
+    console.log(req.user);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "server error" });
@@ -271,7 +251,6 @@ router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
-    console.log(user);
     if (!user) {
       res.status(400).json({ msg: "User not found" });
     } else {
@@ -295,80 +274,62 @@ router.post("/login", async (req, res) => {
   // Validation
   const { errors, isValid } = validateLoginInput(req.body);
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res.status(400).json({ errors: Array.from(errors) });
   }
   // Destructuring
   const { email, password } = req.body;
   // Check For User Existence
-  const user = await User.findOne({ email });
-  // const profile = await Profile.findOne({ user: user.id }).populate("User");
-
-  if (!user) {
-    errors.email = "Not Found";
-    return res.status(404).json(errors);
-  }
-  // log activity
-
-  // Password Validation Strategy
-  const pasMatch = bcrypt.compare(password, user.password);
-
-  if (pasMatch) {
-    // Generate Token
-    jwt.sign(
-      { id: user.id },
-      config.get("tokenSecret"),
-      { expiresIn: 3600 },
-      (error, token) => {
-        if (error) throw error;
-
-        res.json({
-          message: "You are Logged In",
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            token: token
-          }
-        });
-      }
-    );
-  } else {
-    errors.password = "Password incorrect";
-    return res.status(400).json(errors);
-  }
-  // new date
-  let today = new Date().toLocaleDateString();
-  // log activity
-  const activity = {
-    msg: "your last login was on " + today
-  };
-
-  user.activities.unshift(activity);
-
-  // save
-  await user.save();
-});
-
-// @route   GET api/user
-// @desc    Check Auth User
-// @access  Private
-router.get("/", authenticate, async (req, res) => {
   try {
-    User.findById(req.user.id)
-      .select("-password")
-      .then(user =>
-        res.json({
-          message: "You are still Logged In",
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email
-          }
-        })
+    const user = await User.findOne({ email });
+    // const profile = await Profile.findOne({ user: user.id }).populate("User");
+
+    if (!user) {
+      return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
+    }
+
+    // log activity
+
+    // Password Validation Strategy
+    const pasMatch = await bcrypt.compare(password, user.password);
+
+    console.log(user.password, password);
+
+    if (pasMatch) {
+      // Generate Token
+      jwt.sign(
+        { id: user.id },
+        config.get("tokenSecret"),
+        { expiresIn: "2d" },
+        (error, token) => {
+          if (error) throw error;
+
+          res.json({
+            token: token,
+            user: {
+              id: user._id,
+              email: user.email,
+              name: user.name
+            }
+          });
+        }
       );
+    } else {
+      return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
+    }
+    // new date
+    let today = new Date().toLocaleDateString();
+    // log activity
+    const activity = {
+      msg: "your last login was on " + today
+    };
+
+    user.activities.unshift(activity);
+
+    // save
+    await user.save();
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "server error" });
+    console.error(error.message);
+    res.status(500).send("Server error");
   }
 });
 
